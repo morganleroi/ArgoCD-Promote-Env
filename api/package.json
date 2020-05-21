@@ -1,0 +1,35 @@
+{
+  "name": "argo-switch-env",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/src/server.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc",
+    "watch:build": "tsc --watch",
+    "watch:server": "nodemon './dist/src/server.js' --watch './dist/src/'",
+    "start": "npm-run-all clean build --parallel watch:build watch:server --print-label"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@kubernetes/client-node": "^0.11.2",
+    "@types/glob": "^7.1.1",
+    "@types/yaml": "^1.9.7",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "findit": "^2.0.0",
+    "glob": "^7.1.6",
+    "simple-git": "^2.4.0",
+    "simple-git-types": "^1.53.10",
+    "yaml": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.6",
+    "@types/jest": "^25.2.1",
+    "concurrently": "^5.2.0",
+    "jest": "^25.4.0",
+    "nodemon": "^2.0.3",
+    "typescript": "^3.8.3"
+  }
+}
