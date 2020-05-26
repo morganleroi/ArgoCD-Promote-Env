@@ -26,7 +26,7 @@ export const fetchArgoCDRepo = (argoCdGitRepo: string) => {
 export const createPromotionCommit = async (promoteRequest: AppPromotion) => {
     await git()
         .silent(true)
-        .add("./*")
+        .add("*")
         .then(() => console.log("Added files"));
     await git()
         .silent(true)
