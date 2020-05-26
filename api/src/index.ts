@@ -13,6 +13,11 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
     res.json(SOTW);
 });
 
+app.post("/promote", (req: Request, res: Response, next: NextFunction) => {
+    
+    res.statusCode = 201;
+});
+
 app.get("/state", (req: Request, res: Response, next: NextFunction) => {
     res.json(getState());
 });
