@@ -1,9 +1,13 @@
 import React from "react";
-import { Message } from "./Message";
 
-export const Messages: React.FC<Message> = (message) => {
-    if (message !== null) {
-        return <p>{message.value}</p>;
+export type Message = {
+    value: string;
+    type: string;
+  }
+
+export const Messages = (props: { message: Message | undefined}) => {
+    if (props.message !== null) {
+        return <p>{props.message?.value}</p>;
     }
     return <p>RIEN</p>;
 }

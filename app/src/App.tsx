@@ -1,23 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { Message } from './Message';
-import { Messages } from './Messages';
-import { StateOfTheWorld, Application, Env } from './StateOfTheWorld';
+import { Messages, Message } from './Messages';
+import { StateOfTheWorld, Project } from './StateOfTheWorld';
 import { ApplicationEnvViewer } from './ApplicationViewer';
+import { PromoteEnv, PromoteEnvViewer } from './PromoteEnvViewer';
 
 const apiHostname = "http://localhost:49245";
 
 function App() {
-  const [stateOfTheWorld, setStateOfTheWorld] = useState<StateOfTheWorld | undefined>();
-  const [message, setMessage] = useState<Message | undefined>(undefined);
-  const [currentApp, setCurrentApp] = useState<any>();
-
-const promoteEnvCallback = (from:string, to:string) => {
-  console.log("Ok, alors ...");
-  console.log("From" + from);
-  console.log("To" + to);
-}
+  const [stateOfTheWorld, setStateOfTheWorld] = useState<StateOfTheWorld>();
+  const [message, setMessage] = useState<Message>();
+  const [currentApp, setCurrentApp] = useState<Project>();
+  const [promoteEnv, setPromoteEnv] = useState<PromoteEnv>();
 
   useEffect(() => {
     fetch(`${apiHostname}/`).then(async resp => {
@@ -34,21 +28,29 @@ const promoteEnvCallback = (from:string, to:string) => {
 
   return (
     <div>
-      <Messages {...message} />
+      <Messages message={message} />
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <a className="navbar-brand" href="#">Promote Env</a>
+        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
-      <ul className="nav nav-pills nav-fill">
-        {stateOfTheWorld?.AppProject?.map((app, index) => (
-          <li key={index} className="nav-item">
-            <a
-              className={currentApp === app ? "nav-link active" : "nav-link"}
-              onClick={() => setCurrentApp(app)} href="#">{app.Name}
-            </a>
-          </li>
-        ))}
-      </ul>
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul className="navbar-nav mr-auto">
+            {stateOfTheWorld?.AppProject?.map((app, index) => (
+              <li key={index} className={currentApp === app ? "nav-item active" : "nav-item"} >
+                <a className="nav-link" onClick={() => setCurrentApp(app)} href="#">{app.Name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav >
 
-      <ApplicationEnvViewer currentApp={currentApp} apps={stateOfTheWorld?.Apps} promoteEnvCallback={promoteEnvCallback} components={stateOfTheWorld?.Components} />
-    </div>);
+      <div className="container" >
+        <ApplicationEnvViewer currentProject={currentApp} apps={stateOfTheWorld?.Apps} promoteEnvCallback={setPromoteEnv} components={stateOfTheWorld?.Components} />
+      <PromoteEnvViewer promoteEnv={promoteEnv} components={stateOfTheWorld?.Components} />
+    </div ></div>);
 }
 
 export default App;

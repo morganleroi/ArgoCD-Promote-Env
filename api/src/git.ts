@@ -24,11 +24,19 @@ export const fetchArgoCDRepo = (argoCdGitRepo: string) => {
 }
 
 export const createPromotionCommit = async (promoteRequest: AppPromotion) => {
-    await git()
+    await git(repoFolderName)
+        .silent(false)
+        .add("*")
+        .then(() => console.log("Added files"));
+    await git(repoFolderName)
         .silent(true)
         .commit(`Promote ${promoteRequest.projectName} from ${promoteRequest.fromEnv} to ${promoteRequest.toEnv} \
         \
         Component updated : \
-        `, '*')
+        `)
         .then(() => console.log("Commit created"));
+    await git(repoFolderName)
+        .silent(true)
+        .push()
+        .then(() => console.log("Pushed"));
 }

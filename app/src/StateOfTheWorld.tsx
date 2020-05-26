@@ -1,21 +1,23 @@
-export class StateOfTheWorld {
-    AppProject: any[] = []
-    Apps: any[] = []
-    Components: any[] = [] 
+export type StateOfTheWorld = {
+    AppProject: Project[];
+    Apps: AppProject[];
+    Components: ComponentApp[];
 }
 
-export class Application {
-    Name?: string;
-    Envs?: Env[];
+export type Project = {
+    Name: string;
+    Description: string;
 }
 
-export class Env {
-    Name?: string;
-    Url: string = "http://google.fr";
-    Components?: ComponentApp[];
+export type AppProject = {
+    Project: string;
+    Name: string;
+    Environment: string;
+    ValueFilePath: string;
 }
 
-export class ComponentApp {
-    Name?: string;
-    DeployedVersion?: string;
+export type ComponentApp = {
+    Name: string;
+    DeployedVersion: string;
+    App: string;
 }
