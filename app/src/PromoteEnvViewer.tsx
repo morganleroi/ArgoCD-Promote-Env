@@ -1,5 +1,5 @@
 import React from "react";
-import { AppProject, Project } from "./StateOfTheWorld";
+import { AppProject, Project, ComponentApp } from "./StateOfTheWorld";
 
 export type PromoteEnv = {
     project: Project,
@@ -7,10 +7,40 @@ export type PromoteEnv = {
     to: AppProject
 }
 
-export const PromoteEnvViewer = (props: { promoteEnv: PromoteEnv | undefined, components: any[] | undefined }) => {
+export type AppPromotion = {
+    projectName: string;
+    fromEnv: string,
+    toEnv: string,
+    valueFilePath: string;
+    componentsToPromote: ComponentToPromote[]
+}
+
+export type ComponentToPromote = {
+    componentName: string;
+    newVersion: string;
+};
+
+export const PromoteEnvViewer = (props: { promoteEnv: PromoteEnv | undefined, components: ComponentApp[] | undefined }) => {
 
     async function startPromotion() {
-        const response = await fetch("http://localhost:49245/promote", {
+
+        const componentsToPromote: ComponentToPromote[] = [];
+        const fromEnvComponents = props.components?.filter(c => c.App === props.promoteEnv?.from.Name);
+        fromEnvComponents?.forEach(x => componentsToPromote.push({
+            componentName: x.Name,
+            newVersion: x.DeployedVersion
+        }));
+
+        const appPromotion: AppPromotion = {
+            projectName: props.promoteEnv?.project.Name!,
+            fromEnv: props.promoteEnv?.from.Environment!,
+            toEnv: props.promoteEnv?.to.Environment!,
+            valueFilePath: props.promoteEnv?.to.ValueFilePath!,
+            componentsToPromote: componentsToPromote
+
+        }
+
+        const response = await fetch("http://localhost:8080/promote", {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -21,7 +51,7 @@ export const PromoteEnvViewer = (props: { promoteEnv: PromoteEnv | undefined, co
             },
             redirect: 'follow', // manual, *follow, error
             referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: JSON.stringify(props.promoteEnv) // body data type must match "Content-Type" header
+            body: JSON.stringify(appPromotion) // body data type must match "Content-Type" header
         });
         return response.json();
     }

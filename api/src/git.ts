@@ -1,6 +1,6 @@
 import fs from 'fs';
 import git from 'simple-git/promise';
-import { SOTW, AppPromotion } from './server';
+import { AppPromotion } from './server';
 const repoFolderName = "repo";
 
 export const fetchArgoCDRepo = (argoCdGitRepo: string) => {
@@ -30,10 +30,7 @@ export const createPromotionCommit = async (promoteRequest: AppPromotion) => {
         .then(() => console.log("Added files"));
     await git(repoFolderName)
         .silent(true)
-        .commit(`Promote ${promoteRequest.projectName} from ${promoteRequest.fromEnv} to ${promoteRequest.toEnv} \
-        \
-        Component updated : \
-        `)
+        .commit(`Promote ${promoteRequest.projectName} from ${promoteRequest.fromEnv} to ${promoteRequest.toEnv}`)
         .then(() => console.log("Commit created"));
     await git(repoFolderName)
         .silent(true)
