@@ -1,6 +1,7 @@
 import { app } from "."
 import { fetchArgoCDRepo } from "./git";
 import { findFiles, StateOfTheWorld } from "./parser";
+import { getOptions } from "./options";
 
 export type AppPromotion = {
     projectName: string;
@@ -15,12 +16,12 @@ export type ComponentToPromote = {
     newVersion: string;
 };
 
+const options = getOptions();
 
-const repoURl = "https://github.com/momo3038/Argocd-sample.git";
-const port = 8080;
-const host = '0.0.0.0';
-app.listen(port, host, () => {
-    console.log(`Now listening on ${port}`);
+console.log("Repo URL " + options.gitRepoUrl)
+
+app.listen(options.appPort, options.host, () => {
+    console.log(`Now listening on ${options.appPort}`);
 });
 
 console.log("Starting Git Fetch");
@@ -31,14 +32,16 @@ export let SOTW: StateOfTheWorld = {
     Components: []
 };
 
-const computeSotw = () => fetchArgoCDRepo(repoURl)
-    .then(() => findFiles()
+
+
+const computeSotw = () => fetchArgoCDRepo(options.gitRepoUrl)
+    .then(() => findFiles(options)
         .then(sotw => {
             SOTW = sotw}
             ));
 
 
 computeSotw().then(() => {
-    console.log("Starting to rebuild SOTW every minute")
-    setInterval(computeSotw, 60*1000);
+    console.log(`Starting to rebuild SOTW every ${options.rebuildSOTWAfterMs} ms`)
+    setInterval(computeSotw, options.rebuildSOTWAfterMs);
 });
