@@ -30,13 +30,15 @@ const AddApplication = (apps: any[], components: any[], yamlParsed: any, options
 
     const valuesFile = fs.readFileSync(`${options.localRepositoryName}/${yamlParsed.spec.source.path}/${yamlParsed.spec.source.helm.valueFiles}`, options.fileEncoding);
     const yaml = YAML.parse(valuesFile);
-    yaml.components.forEach((component: any) => {
-        components.push({
-            Name: component.name,
-            DeployedVersion: component.version,
-            App: yamlParsed.metadata.name
-        })
-    });
+    if (yaml?.components !== undefined) {
+        yaml.components.forEach((component: any) => {
+            components.push({
+                Name: component.name,
+                DeployedVersion: component.version,
+                App: yamlParsed.metadata.name
+            })
+        });
+    }
 }
 
 export const findFiles = (options: PromoteEnvOptions): Promise<StateOfTheWorld> => {

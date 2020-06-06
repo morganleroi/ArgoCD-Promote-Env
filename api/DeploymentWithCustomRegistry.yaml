@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-promote-env-deployment
+  labels:
+    app: argocd-promote-env
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argocd-promote-env
+  template:
+    metadata:
+      labels:
+        app: argocd-promote-env
+    spec:
+      containers:
+      - name: argocd-promote-env
+        image: harbor-custom-registry/argocd-promote-env:1.0
+        imagePullPolicy: Always
+        env:
+        - name: gitRepositoryUrl
+          value: "https://github.com/momo3038/Argocd-sample.git"
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+        - name: harbor
+
