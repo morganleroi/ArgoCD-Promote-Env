@@ -10,6 +10,35 @@ export type StateOfTheWorld = {
     Components: any[];
 }
 
+const addAppProject = (appProjects: any[], yamlParsed: any) => {
+    if (appProjects.findIndex((e: { Name: string; }) => e.Name === yamlParsed.metadata.name) === -1) {
+        appProjects.push({
+            Name: yamlParsed.metadata.name,
+            Description: yamlParsed.spec.description
+        });
+    }
+}
+
+const AddApplication = (apps: any[], components: any[], yamlParsed: any, options: PromoteEnvOptions) => {
+    apps.push({
+        Project: yamlParsed.spec.project,
+        Name: yamlParsed.metadata.name,
+        Description: yamlParsed.spec.description,
+        Environment: yamlParsed.spec.environment,
+        ValueFilePath: yamlParsed.spec.source.helm.valueFiles
+    });
+
+    const valuesFile = fs.readFileSync(`${options.localRepositoryName}/${yamlParsed.spec.source.path}/${yamlParsed.spec.source.helm.valueFiles}`, options.fileEncoding);
+    const yaml = YAML.parse(valuesFile);
+    yaml.components.forEach((component: any) => {
+        components.push({
+            Name: component.name,
+            DeployedVersion: component.version,
+            App: yamlParsed.metadata.name
+        })
+    });
+}
+
 export const findFiles = (options: PromoteEnvOptions): Promise<StateOfTheWorld> => {
     const apps: any[] = [];
     const appProject: any[] = [];
@@ -23,33 +52,12 @@ export const findFiles = (options: PromoteEnvOptions): Promise<StateOfTheWorld> 
                 const yamls = YAML.parseAllDocuments(file);
                 yamls.forEach(yaml => {
                     const yamlParsed = yaml.toJSON();
-                    if (yamlParsed.kind !== undefined && yamlParsed.kind === 'AppProject') {
-                        if (appProject.findIndex((e: { Name: string; }) => e.Name === yamlParsed.metadata.name) === -1) {
-                            appProject.push({
-                                Name: yamlParsed.metadata.name,
-                                Description: yamlParsed.spec.description
-                            });
-                        }
+                    if (yamlParsed?.kind === 'AppProject') {
+                        addAppProject(appProject, yamlParsed);
                     }
 
-                    if (yamlParsed.kind !== undefined && yamlParsed.kind === 'Application') {
-                        apps.push({
-                            Project: yamlParsed.spec.project,
-                            Name: yamlParsed.metadata.name,
-                            Description: yamlParsed.spec.description,
-                            Environment: yamlParsed.spec.environment,
-                            ValueFilePath: yamlParsed.spec.source.helm.valueFiles
-                        });
-
-                        const valuesFile = fs.readFileSync(`${options.localRepositoryName}/${yamlParsed.spec.source.path}/${yamlParsed.spec.source.helm.valueFiles}`, options.fileEncoding);
-                        const yaml = YAML.parse(valuesFile);
-                        yaml.components.forEach((component: any) => {
-                            components.push({
-                                Name: component.name,
-                                DeployedVersion: component.version,
-                                App: yamlParsed.metadata.name
-                            })
-                        });
+                    if (yamlParsed?.kind === 'Application') {
+                        AddApplication(apps, components, yamlParsed, options);
                     }
                 });
             });
