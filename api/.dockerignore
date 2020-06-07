@@ -1,4 +1,5 @@
 *
+!apk/
 !src/
 !tsconfig.json
 !tsconfig.build.json
