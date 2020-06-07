@@ -5,7 +5,7 @@ import { StateOfTheWorld, Project } from './StateOfTheWorld';
 import { ApplicationEnvViewer } from './ApplicationViewer';
 import { PromoteEnv, PromoteEnvViewer } from './PromoteEnvViewer';
 
-const apiHostname = "http://localhost:49245";
+const apiHostname = "http://localhost:8080";
 
 function App() {
   const [stateOfTheWorld, setStateOfTheWorld] = useState<StateOfTheWorld>();
@@ -29,7 +29,7 @@ function App() {
   return (
     <div>
       <Messages message={message} />
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <a className="navbar-brand" href="#">Promote Env</a>
         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
@@ -39,7 +39,10 @@ function App() {
           <ul className="navbar-nav mr-auto">
             {stateOfTheWorld?.AppProject?.map((app, index) => (
               <li key={index} className={currentApp === app ? "nav-item active" : "nav-item"} >
-                <a className="nav-link" onClick={() => setCurrentApp(app)} href="#">{app.Name}
+                <a className="nav-link" onClick={() => {
+                  setCurrentApp(app);
+                  setPromoteEnv(undefined);
+                }} href="#">{app.Name}
                 </a>
               </li>
             ))}
@@ -47,10 +50,10 @@ function App() {
         </div>
       </nav >
 
-      <div className="container" >
+      <div className="container-fluid mt-1" >
         <ApplicationEnvViewer currentProject={currentApp} apps={stateOfTheWorld?.Apps} promoteEnvCallback={setPromoteEnv} components={stateOfTheWorld?.Components} />
-      <PromoteEnvViewer promoteEnv={promoteEnv} components={stateOfTheWorld?.Components} />
-    </div ></div>);
+        <PromoteEnvViewer promoteEnv={promoteEnv} components={stateOfTheWorld?.Components} />
+      </div ></div>);
 }
 
 export default App;

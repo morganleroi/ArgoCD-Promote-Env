@@ -20,4 +20,5 @@ export type ComponentApp = {
     Name: string;
     DeployedVersion: string;
     App: string;
+    Selected: boolean;
 }

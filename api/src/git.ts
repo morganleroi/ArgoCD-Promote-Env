@@ -4,7 +4,6 @@ import { AppPromotion } from './server';
 const repoFolderName = "repo";
 
 export const fetchArgoCDRepo = (argoCdGitRepo: string) => {
-
     if (fs.existsSync(repoFolderName)) {
         console.log("Repo already exist");
         return git(repoFolderName)
@@ -24,13 +23,18 @@ export const fetchArgoCDRepo = (argoCdGitRepo: string) => {
 }
 
 export const createPromotionCommit = async (promoteRequest: AppPromotion) => {
+    const commitMessage: string[] = [];
+    commitMessage.push(`Promote ${promoteRequest.projectName} from ${promoteRequest.fromEnv} to ${promoteRequest.toEnv}`);
+    commitMessage.push(`Component modified:`);
+    commitMessage.push(...promoteRequest.componentsToPromote.map(x => x.componentName));
+
     await git(repoFolderName)
         .silent(false)
         .add("*")
         .then(() => console.log("Added files"));
     await git(repoFolderName)
         .silent(true)
-        .commit(`Promote ${promoteRequest.projectName} from ${promoteRequest.fromEnv} to ${promoteRequest.toEnv}`)
+        .commit(commitMessage)
         .then(() => console.log("Commit created"));
     await git(repoFolderName)
         .silent(true)

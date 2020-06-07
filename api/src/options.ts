@@ -9,7 +9,7 @@ export interface PromoteEnvOptions {
 }
 
 const defaultOptions: PromoteEnvOptions = {
-    gitRepoUrl: "Please set it !",
+    gitRepoUrl: "https://github.com/momo3038/Argocd-sample.git",
     appPort: 8080,
     host: '0.0.0.0',
     fileEncoding: 'utf8',

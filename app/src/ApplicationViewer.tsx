@@ -15,16 +15,16 @@ export const ApplicationEnvViewer = (props: { apps: AppProject[] | undefined, co
     return (
         <div className="row" >
             {apps?.map(app => (
-                <div className="col-sm-6" key={app.Name + '-' + app.Project}>
+                <div className="col-sm-4" key={app.Name + '-' + app.Project}>
                     <div className="card" >
                         <h5 className="card-header">
                             <div className="row">
-                                <a className="col-sm-6" href="#" >{app.Environment}</a>
-                                <div className="btn-group col-sm-6">
+                                <div className="col-sm" >{app.Environment}</div>
+                                <div className="col-sm btn-group">
                                     <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Promote</button>
                                     <div className="dropdown-menu">
                                         {
-                                            apps?.map(env => (
+                                            apps?.filter(env => env.Environment !== app.Environment).map(env => (
                                                 <a key={env.Environment} className="dropdown-item" onClick={() => props.promoteEnvCallback({
                                                     from: app, to: env, project: props.currentProject!
                                                 })} >{env.Environment}</a>
@@ -40,7 +40,7 @@ export const ApplicationEnvViewer = (props: { apps: AppProject[] | undefined, co
                                 {props.components?.filter(component => component.App === app.Name).map(component => (
                                     <li key={component.Name} className="list-group-item d-flex justify-content-between align-items-center">
                                         {component.Name}
-                                        <span className="badge badge-primary badge-pill">{component.DeployedVersion}</span>
+                                        <span className="badge badge-light badge-pill">{component.DeployedVersion.split(':').pop()}</span>
                                     </li>
                                 ))}
                             </ul>
