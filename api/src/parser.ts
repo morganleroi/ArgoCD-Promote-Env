@@ -3,6 +3,7 @@ import YAML from 'yaml'
 import fs from 'fs';
 import { AppPromotion } from './server';
 import { PromoteEnvOptions, getOptions } from './options';
+import { isArray, isNullOrUndefined } from 'util';
 
 export type StateOfTheWorld = {
     AppProject: any[];
@@ -41,14 +42,26 @@ const AddApplication = (apps: any[], components: any[], yamlParsed: any, options
         });
     }
     if (yaml?.front !== undefined) {
-        yaml.front.forEach((component: any) => {
+        if (isArray(yaml.front)) {
+            yaml.front.forEach((component: any) => {
+                components.push({
+                    Name: component.name,
+                    DeployedVersion: component.version,
+                    App: yamlParsed.metadata.name,
+                    ComponentType: "Front"
+                })
+            });
+        }
+        else {
             components.push({
-                Name: component.name,
-                DeployedVersion: component.version,
+                Name: "Front",
+                DeployedVersion: yaml.front.version,
                 App: yamlParsed.metadata.name,
                 ComponentType: "Front"
             })
-        });
+        }
+
+
     }
 }
 
@@ -102,14 +115,21 @@ export const writeValuesFiles = async (appPromotion: AppPromotion) => {
     });
 
     if (appPromotion.componentsToPromote.some(c => c.componentType === "Front")) {
-        yaml.get("front").items.forEach((yamlComponentItem: any) => {
-            const yamlComponentName = yamlComponentItem.get("name");
-            const foundComponent = appPromotion.componentsToPromote.find(c => c.componentType === "Front" && c.componentName === yamlComponentName)
-            if (foundComponent) {
-                console.log("change version front...")
-                yamlComponentItem.set('version', foundComponent.newVersion);
-            }
-        });
+        var getVersion = yaml.get("front").get("version");
+        if (isNullOrUndefined(getVersion)) {
+            yaml.get("front").items.forEach((yamlComponentItem: any) => {
+                const yamlComponentName = yamlComponentItem.get("name");
+                const foundComponent = appPromotion.componentsToPromote.find(c => c.componentType === "Front" && c.componentName === yamlComponentName)
+                if (foundComponent) {
+                    console.log("change version front...")
+                    yamlComponentItem.set('version', foundComponent.newVersion);
+                }
+            });
+        }
+        else {
+            console.log("change version front...")
+            yaml.get("front").set('version', appPromotion.componentsToPromote.find(c => c.componentType === "Front")?.newVersion);
+        }
     }
 
     fs.writeFileSync(filePath, yaml.toString(), options.fileEncoding);
