@@ -14,6 +14,7 @@ export type AppPromotion = {
 export type ComponentToPromote = {
     componentName: string;
     newVersion: string;
+    componentType: "Front" | "Back";
 };
 
 const options = getOptions();

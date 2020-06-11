@@ -21,7 +21,7 @@ export const ApplicationEnvViewer = (props: { apps: AppProject[] | undefined, co
                             <div className="row">
                                 <div className="col-sm" >{app.Environment}</div>
                                 <div className="col-sm btn-group">
-                                    <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Promote</button>
+                                    <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Promote package to</button>
                                     <div className="dropdown-menu">
                                         {
                                             apps?.filter(env => env.Environment !== app.Environment).map(env => (
@@ -35,9 +35,18 @@ export const ApplicationEnvViewer = (props: { apps: AppProject[] | undefined, co
                             </div>
                         </h5>
                         <div className="card-body">
-                            <h6 className="card-title">Deployed components</h6>
+                            <h6 className="card-title"><img src="chrome.png" width="20px" height="20px" /> Deployed front components</h6>
                             <ul className="list-group">
-                                {props.components?.filter(component => component.App === app.Name).map(component => (
+                                {props.components?.filter(component => component.App === app.Name && component.ComponentType === "Front").map(component => (
+                                    <li key={component.Name} className="list-group-item d-flex justify-content-between align-items-center">
+                                        {component.Name}
+                                        <span className="badge badge-light badge-pill">{component.DeployedVersion.split(':').pop()}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                            <h6 className="card-title mt-2"><img src="kube.png" width="20px" height="20px" /> Deployed back components</h6>
+                            <ul className="list-group">
+                                {props.components?.filter(component => component.App === app.Name && component.ComponentType === "Back").map(component => (
                                     <li key={component.Name} className="list-group-item d-flex justify-content-between align-items-center">
                                         {component.Name}
                                         <span className="badge badge-light badge-pill">{component.DeployedVersion.split(':').pop()}</span>

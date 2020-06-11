@@ -18,12 +18,14 @@ export type AppPromotion = {
 export type ComponentToPromote = {
     componentName: string;
     newVersion: string;
+    componentType: string;
 };
 
 type ComponentPromotionViewer = {
     componentName: string;
     oldVersion?: string;
     newVersion?: string;
+    isSameVersion: boolean
 }
 
 export const PromoteEnvViewer = (props: { promoteEnv: PromoteEnv | undefined, components: ComponentApp[] | undefined }) => {
@@ -35,10 +37,14 @@ export const PromoteEnvViewer = (props: { promoteEnv: PromoteEnv | undefined, co
     const componentPromotions: ComponentPromotionViewer[] = [];
     fromEnvComponents?.forEach(c => {
         const oldComponent = toEnvComponents?.find(oldComponent => oldComponent.Name === c.Name);
+        const newVersion = c.DeployedVersion.split(':').pop();
+        const oldVersion = oldComponent?.DeployedVersion.split(':').pop();
+
         componentPromotions.push({
             componentName: c.Name,
-            newVersion: c.DeployedVersion.split(':').pop(),
-            oldVersion: oldComponent?.DeployedVersion.split(':').pop()
+            newVersion: newVersion,
+            oldVersion: oldVersion,
+            isSameVersion: newVersion === oldVersion
         })
     });
 
@@ -48,7 +54,8 @@ export const PromoteEnvViewer = (props: { promoteEnv: PromoteEnv | undefined, co
         const fromEnvComponents = props.components?.filter(c => c.App === props.promoteEnv?.from.Name);
         fromEnvComponents?.forEach(x => componentsToPromote.push({
             componentName: x.Name,
-            newVersion: x.DeployedVersion
+            newVersion: x.DeployedVersion,
+            componentType: x.ComponentType,
         }));
 
         const appPromotion: AppPromotion = {
@@ -77,38 +84,39 @@ export const PromoteEnvViewer = (props: { promoteEnv: PromoteEnv | undefined, co
     }
 
     return (
-        <div>
-            <div className="row" >
-                <p>You will promote {props.promoteEnv?.project.Name} from {props.promoteEnv?.from.Environment} to {props.promoteEnv?.to.Environment}</p>
-                <p>You can select the component you want to promote.</p>
-
-                <div className="card-body">
-                    <h6 className="card-title">To be deployed components</h6>
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Current version</th>
-                                <th scope="col">new version</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {componentPromotions.map(c => (
+        <div className="row mt-1" >
+            <div className="col-sm-12">
+                <div className="card" >
+                    <h5 className="card-header">
+                        You will promote {props.promoteEnv?.project.Name} from {props.promoteEnv?.from.Environment} to {props.promoteEnv?.to.Environment}
+                    </h5>
+                    <div className="card-body">
+                        <h6 className="card-title"></h6>
+                        <table className="table">
+                            <thead>
                                 <tr>
-                                    <th scope="row">{c.componentName}</th>
-                                    <td><span className="badge badge-primary badge-pill">{c.oldVersion}</span></td>
-                                    <td><span className="badge badge-success badge-pill">{c.newVersion}</span></td>
+                                    <th scope="col"></th>
+                                    <th scope="col">Current version</th>
+                                    <th scope="col">new version</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {componentPromotions.map(c => (
+                                    <tr>
+                                        <th scope="row">{c.componentName}</th>
+                                        <td><span className="badge badge-primary badge-pill">{c.oldVersion}</span></td>
+                                        <td><span className={c.isSameVersion ? "badge badge-primary badge-pill" : "badge badge-success badge-pill"} >{c.newVersion}</span></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <div className="row justify-content-end">
+                            {componentPromotions.some(c => !c.isSameVersion) ?
+                                <button type="button" className="btn btn-danger" onClick={startPromotion} >Yes, launch the promotion !</button> : <div>Nothing to promote</div>}
+                        </div>
+                    </div>
                 </div>
-
             </div>
-            <div className="row">
-                <button type="button" className="btn btn-danger" onClick={startPromotion} >Yes, launch the promotion !</button>
-            </div>
-
         </div>
     );
 };

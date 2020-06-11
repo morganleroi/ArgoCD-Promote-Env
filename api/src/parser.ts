@@ -35,7 +35,18 @@ const AddApplication = (apps: any[], components: any[], yamlParsed: any, options
             components.push({
                 Name: component.name,
                 DeployedVersion: component.version,
-                App: yamlParsed.metadata.name
+                App: yamlParsed.metadata.name,
+                ComponentType: "Back"
+            })
+        });
+    }
+    if (yaml?.front !== undefined) {
+        yaml.front.forEach((component: any) => {
+            components.push({
+                Name: component.name,
+                DeployedVersion: component.version,
+                App: yamlParsed.metadata.name,
+                ComponentType: "Front"
             })
         });
     }
@@ -79,13 +90,27 @@ export const writeValuesFiles = async (appPromotion: AppPromotion) => {
     const valuesFile = fs.readFileSync(filePath, 'utf8');
     const yaml = YAML.parseDocument(valuesFile);
 
+    console.log(yaml.toString());
+
     yaml.get("components").items.forEach((yamlComponentItem: any) => {
         const yamlComponentName = yamlComponentItem.get("name");
         const foundComponent = appPromotion.componentsToPromote.find(c => c.componentName === yamlComponentName)
         if (foundComponent) {
+            console.log("change version back...")
             yamlComponentItem.set('version', foundComponent.newVersion);
         }
     });
+
+    if (appPromotion.componentsToPromote.some(c => c.componentType === "Front")) {
+        yaml.get("front").items.forEach((yamlComponentItem: any) => {
+            const yamlComponentName = yamlComponentItem.get("name");
+            const foundComponent = appPromotion.componentsToPromote.find(c => c.componentType === "Front" && c.componentName === yamlComponentName)
+            if (foundComponent) {
+                console.log("change version front...")
+                yamlComponentItem.set('version', foundComponent.newVersion);
+            }
+        });
+    }
 
     fs.writeFileSync(filePath, yaml.toString(), options.fileEncoding);
 };

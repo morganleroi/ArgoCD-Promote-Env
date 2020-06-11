@@ -21,4 +21,5 @@ export type ComponentApp = {
     DeployedVersion: string;
     App: string;
     Selected: boolean;
+    ComponentType: string;
 }
