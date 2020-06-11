@@ -12,7 +12,7 @@ var cors = require('cors');
 app.use(cors());
 app.use(bodyParser.json())
 
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
+app.get("/sotw", (req: Request, res: Response, next: NextFunction) => {
     res.json(SOTW);
 });
 

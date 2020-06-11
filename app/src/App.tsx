@@ -14,7 +14,7 @@ function App() {
   const [promoteEnv, setPromoteEnv] = useState<PromoteEnv>();
 
   useEffect(() => {
-    fetch(`${apiHostname}/`).then(async resp => {
+    fetch(`${apiHostname}/sotw`).then(async resp => {
       if (resp.ok) {
         setStateOfTheWorld(await resp.json())
       }
