@@ -19,18 +19,10 @@ export const fetchArgoCDRepo = (argoCdGitRepo: string) => {
 }
 
 export const createPromotionCommit = async (promoteRequest: AppPromotion) => {
-    await git(repoFolderName)
-        .silent(false)
-        .add("*")
-        .then(() => console.log("Added files"), (error) => console.log(`Git Add rejected: ${error}`));
-
-    await git(repoFolderName)
-        .silent(true)
-        .commit(`Promote ${promoteRequest.projectName} from ${promoteRequest.fromEnv} to ${promoteRequest.toEnv}`)
-        .then((commit) => console.log(`Commit created : ${commit.commit}`), (error) => console.log(`Commit rejected: ${error}`));
-        
-    await git(repoFolderName)
-        .silent(true)
-        .push()
-        .then(() => console.log("Push completed"), (error) => console.log(`Push rejected : ${error}`));
+    const gitI = await git(repoFolderName).silent(true);
+    await gitI.add("*").then(() => console.log("Added files"), (error) => console.log(`Git Add rejected: ${error}`));
+    await gitI.addConfig('user.name', 'promote-env-bot');
+    await gitI.addConfig('user.email', 'promote-env-bot@bot.com');
+    await gitI.commit(`Promote ${promoteRequest.projectName} from ${promoteRequest.fromEnv} to ${promoteRequest.toEnv}`).then((commit) => console.log(`Commit created : ${commit.commit}`), (error) => console.log(`Commit rejected: ${error}`));
+    await gitI.push().then(() => console.log("Push completed"), (error) => console.log(`Push rejected : ${error}`));
 }
